@@ -1,6 +1,11 @@
+"use client";
+
 import React from "react";
 import transactionsRaw from "../data/transactions.json";
 import TransactionItem from "../components/TransactionItem";
+
+import { useRouter } from "next/navigation";
+import { useTransaction } from "@/context/Transaction";
 
 type Transaction = {
   id: string;
@@ -23,6 +28,14 @@ export default function Home() {
     type: tx.type as "Payment" | "Credit",
     status: tx.status as "Approved" | "Pending" | "Declined",
   })) as Transaction[];
+
+  const { setSelectedTransaction } = useTransaction();
+  const router = useRouter();
+
+  const handleTransactionClick = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    router.push("/detail");
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
@@ -53,7 +66,13 @@ export default function Home() {
         <h2 className="font-semibold text-md mb-3 text-black">Latest Transactions</h2>
         <div className="space-y-2">
           {transactions.map((tx) => (
-            <TransactionItem key={tx.id} transaction={tx} />
+            <div
+              key={tx.id}
+              onClick={() => handleTransactionClick(tx)} // Manejar clic en la transacción
+              className="cursor-pointer"
+            >
+              <TransactionItem transaction={tx} />
+            </div>
           ))}
         </div>
       </div>
